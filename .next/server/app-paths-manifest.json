@@ -1,9 +1,8 @@
 {
   "/quizs/page": "app/quizs/page.js",
-  "/sign-in/page": "app/sign-in/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/page": "app/page.js",
   "/quizs/p/[quizid]/page": "app/quizs/p/[quizid]/page.js",
-  "/quizs/[quizid]/page": "app/quizs/[quizid]/page.js",
-  "/quizs/[quizid]/question/[questionid]/page": "app/quizs/[quizid]/question/[questionid]/page.js"
+  "/sign-in/page": "app/sign-in/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/quizs/[quizid]/page": "app/quizs/[quizid]/page.js"
 }

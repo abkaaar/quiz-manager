@@ -166,7 +166,7 @@ export default function QuizAdminLayout({
         <ScrollArea className="h-[calc(100vh-4rem)]">
           {isSidebarOpen ? (
             <div className="p-4">
-              {/* <BulkUpdateForm /> */}
+              <BulkUpdateForm />
 
               {/* <ImportOptions /> */}
             </div>
