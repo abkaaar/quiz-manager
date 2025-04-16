@@ -35,28 +35,14 @@ const BulkUpdateForm = () => (
   <Card className="mb-4">
     <CardHeader className="pb-2">
       <CardTitle className="text-sm font-medium">
-        Bulk Update Questions
+        Bulk Time Update
       </CardTitle>
-      <CardDescription>Update multiple questions at once</CardDescription>
+      <CardDescription>Update time for all questions at once</CardDescription>
     </CardHeader>
     <CardContent>
       <div className="space-y-2">
         <div className="grid grid-cols-1 gap-2">
-          <div>
-            <select
-              className="w-full rounded border p-2 bg-white"
-              defaultValue=""
-            >
-              <option value="" disabled>
-                Select points
-              </option>
-              <option value="1">1 points</option>
-              <option value="5">5 points</option>
-              <option value="10">10 points</option>
-              <option value="15">15 points</option>
-              <option value="20">20 points</option>
-            </select>
-          </div>
+     
           <div>
             <select
               className="w-full rounded border p-2 bg-white"
@@ -77,6 +63,149 @@ const BulkUpdateForm = () => (
     </CardContent>
   </Card>
 );
+
+const IntroductionForm = () => (
+  <Card className="mb-4">
+    <CardHeader className="pb-2">
+      <CardTitle className="text-sm font-medium">
+        Introduction
+      </CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="space-y-2">
+        <textarea
+          className="w-full rounded border p-2 bg-white"
+          placeholder="Add or edit the introduction text here..."
+          rows={4}
+        ></textarea>
+      </div>
+    </CardContent>
+  </Card>
+);
+
+const RulesForm = () => {
+  const [rules, setRules] = useState<string[]>([]);
+  const [newRule, setNewRule] = useState("");
+
+  const addRule = () => {
+    if (newRule.trim()) {
+      setRules([...rules, newRule.trim()]);
+      setNewRule("");
+    }
+  };
+
+  const removeRule = (index: number) => {
+    setRules(rules.filter((_, i) => i !== index));
+  };
+
+  return (
+    <Card className="mb-4">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium">Rules</CardTitle>
+        <CardDescription>Set the rules for the competition</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          <div>
+            <input
+              type="text"
+              className="w-full rounded border p-2 bg-white"
+              placeholder="Write a rule..."
+              value={newRule}
+              onChange={(e) => setNewRule(e.target.value)}
+            />
+          </div>
+          <div>
+            <Button className="w-full" onClick={addRule}>
+              Add Rule
+            </Button>
+          </div>
+          <ul className="space-y-1">
+            {rules.map((rule, index) => (
+              <li
+                key={index}
+                className="flex items-center justify-between border p-2 rounded"
+              >
+                <span>{rule}</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeRule(index)}
+                >
+                  ✕
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const ParticipantForm = () => {
+  const [participants, setParticipants] = useState<string[]>([]);
+  const [newParticipant, setNewParticipant] = useState("");
+
+  const addParticipant = () => {
+    if (newParticipant.trim()) {
+      setParticipants([...participants, newParticipant.trim()]);
+      setNewParticipant("");
+    }
+  };
+
+  const removeRule = (index: number) => {
+    setParticipants(participants.filter((_, i) => i !== index));
+  };
+
+  return (
+    <Card className="mb-4">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium">Participant</CardTitle>
+        <CardDescription>Set the participant for the competition</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          <div>
+            <input
+              type="text"
+              className="w-full rounded border p-2 bg-white"
+              placeholder="Write a rule..."
+              value={newParticipant}
+              onChange={(e) => setNewParticipant(e.target.value)}
+            />
+          </div>
+          <div>
+            <Button className="w-full" onClick={addParticipant}>
+              Add Participant
+            </Button>
+          </div>
+          <ul className="space-y-1">
+            {participants.map((participant, index) => (
+              <li
+                key={index}
+                className="flex items-center justify-between border p-2 rounded"
+              >
+                <span>{participant}</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeRule(index)}
+                >
+                  ✕
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+
+
+
 
 // const ImportOptions = () => (
 //   <Card>
@@ -167,8 +296,9 @@ export default function QuizAdminLayout({
           {isSidebarOpen ? (
             <div className="p-4">
               <BulkUpdateForm />
-
-              {/* <ImportOptions /> */}
+              <IntroductionForm/>
+              <RulesForm/>
+              <ParticipantForm/>
             </div>
           ) : (
             <nav className="flex flex-col items-center gap-4 p-2">
