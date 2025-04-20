@@ -1,7 +1,0 @@
-{
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/quizs/page": "app/quizs/page.js",
-  "/sign-in/page": "app/sign-in/page.js",
-  "/quizs/p/[quizid]/page": "app/quizs/p/[quizid]/page.js",
-  "/quizs/[quizid]/page": "app/quizs/[quizid]/page.js"
-}

@@ -11,8 +11,6 @@ import { db } from "@/utils/firebase";
 
 // Common Question Editor Header Component
 export interface QuestionEditorHeaderProps {
-  points: number;
-  onPointsChange: (points: number) => void;
   timeLimit: number;
   onTimeLimitChange: (seconds: number) => void;
   onSaveQuestion: () => void;
@@ -22,47 +20,18 @@ export interface QuestionEditorHeaderProps {
 }
 
 export const QuestionEditorHeader = ({
-  points,
-  onPointsChange,
   timeLimit,
   onTimeLimitChange,
   onSaveQuestion,
   isSaving,
 }: QuestionEditorHeaderProps) => {
-  const [pointsMenuOpen, setPointsMenuOpen] = useState(false);
   const [timeMenuOpen, setTimeMenuOpen] = useState(false);
 
   return (
     <>
       <div className="bg-white p-2 border-b flex items-center justify-between">
         <div className="flex items-center">
-          <div className="mr-2 relative">
-            <button
-              className="flex items-center bg-white border rounded-md px-3 py-1 text-sm"
-              onClick={() => setPointsMenuOpen(!pointsMenuOpen)}
-            >
-              <Award className="mr-1 h-4 w-4" />
-              {points} point{points !== 1 ? "s" : ""}
-              <ChevronDown className="ml-1 h-4 w-4" />
-            </button>
-
-            {pointsMenuOpen && (
-              <div className="absolute mt-1 w-24 bg-white rounded-md shadow-lg z-10 border">
-                {[1, 2, 3, 5, 10].map((value) => (
-                  <div
-                    key={value}
-                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => {
-                      onPointsChange(value);
-                      setPointsMenuOpen(false);
-                    }}
-                  >
-                    {value} point{value !== 1 ? "s" : ""}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+       
 
           <div className="mr-2 relative">
             <button
@@ -207,8 +176,6 @@ const QuestionEditor = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <QuestionEditorHeader
-        points={points}
-        onPointsChange={setPoints}
         timeLimit={timeLimit}
         onTimeLimitChange={setTimeLimit}
         onSaveQuestion={saveQuestion}

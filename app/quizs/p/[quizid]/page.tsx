@@ -1,16 +1,23 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  getDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "@/utils/firebase";
 import React, { useState, useEffect } from "react";
-import { Clock, Award, X } from "lucide-react";
+import { Clock, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Question {
   id: string;
   questionText: string;
   timeLimit: number;
-  points: number;
   answer: string;
   questionNumber: number;
 }
@@ -29,6 +36,12 @@ const ParticipantQuestions = () => {
 
   const [startTime, setStartTime] = useState<number | null>(null);
   const [timeSpent, setTimeSpent] = useState<number | null>(null);
+
+  const [scores, setScores] = useState<Record<string, number>>({});
+
+  const [introduction, setIntroduction] = useState("");
+  const [participants, setParticipants] = useState<string[]>([]);
+  const [rules, setRules] = useState<string[]>([]);
 
   const timerRef = React.useRef<NodeJS.Timeout | null>(null);
   const params = useParams();
@@ -63,12 +76,37 @@ const ParticipantQuestions = () => {
 
   // Show results when all questions are attempted
   useEffect(() => {
-    if (allQuestionsAttempted && currentStep === 3) {
-      setCurrentStep(4);
+    if (allQuestionsAttempted && currentStep === 4 && showAnswer) {
+      setCurrentStep(5);
     }
-  }, [allQuestionsAttempted, currentStep]);
+  }, [allQuestionsAttempted, currentStep, showAnswer]);
 
-  // quextions
+  // quiz details
+  useEffect(() => {
+    const fetchQuizDetails = async () => {
+      try {
+        const docRef = doc(db, "quizzes", quizId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setIntroduction(data.introduction || "");
+          setParticipants(
+            Array.isArray(data.participants) ? data.participants : []
+          );
+          setRules(Array.isArray(data.rules) ? data.rules : []);
+        }
+      } catch (error) {
+        console.error("Error fetching quiz details:", error);
+      }
+    };
+
+    if (quizId) {
+      fetchQuizDetails();
+    }
+  }, [quizId]);
+
+  // questions
   useEffect(() => {
     const fetchQuestions = async () => {
       const q = query(
@@ -123,279 +161,345 @@ const ParticipantQuestions = () => {
     }
   };
 
+  function restartQuiz(
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ): void {
+    setCurrentStep(1); // Reset to the welcome step
+    setAttemptedQuestions([]); // Clear attempted questions
+    setSelectedQuestion(null); // Deselect any selected question
+    setShowAnswer(false); // Hide any shown answers
+    setTimeLeft(null); // Reset the timer
+    setStartTime(null); // Clear the start time
+    setTimeSpent(null); // Clear the time spent
+  }
+
+  const handleScore = (questionId: string, score: number) => {
+    setScores((prev) => ({
+      ...prev,
+      [questionId]: score,
+    }));
+  };
+
+  const totalScore = Object.values(scores).reduce((acc, curr) => acc + curr, 0);
+
   return (
-    <div className="p-4 mx-auto">
-      {/* Progress Bar */}
-      <div className="w-full bg-gray-100 rounded-full h-2 mb-6">
-        <div
-          className="bg-indigo-600 h-2 rounded-full transition-all duration-1000"
-          style={{ width: `${getProgressPercentage()}%` }}
-        ></div>
-      </div>
-
-      {/* Step 1: Welcome */}
-      {currentStep === 1 && (
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
-            Welcome to the Ceremony
-          </h1>
-          <div className="flex justify-center mb-8">
-            <span className="text-6xl">🎉</span>
-          </div>
-          <h2 className="text-xl font-semibold text-indigo-700 mb-4">
-            Introduction
-          </h2>
-          <p className="text-gray-700 mb-4">
-            Welcome to our special ceremony! We're delighted to have you join us
-            for this memorable occasion. Today's event includes a fun quiz that
-            will test your knowledge and make this gathering even more
-            enjoyable.
-          </p>
-          <p className="text-gray-700 mb-6">
-            Before we begin, we'd like to thank everyone for participating and
-            bringing your enthusiasm to make this ceremony a success. The quiz
-            is designed to be both entertaining and informative, so get ready
-            for some fun challenges ahead!
-          </p>
-          <div className="flex justify-end">
-            <button
-              onClick={nextStep}
-              className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
-            >
-              Continue to Rules
-            </button>
-          </div>
+    <>
+      <div className="p-4 mx-auto">
+        {/* Progress Bar */}
+        <div className="w-full bg-gray-100 rounded-full h-2 mb-6">
+          <div
+            className="bg-indigo-600 h-2 rounded-full transition-all duration-1000"
+            style={{ width: `${getProgressPercentage()}%` }}
+          ></div>
         </div>
-      )}
 
-      {/* Step 2: Rules */}
-      {currentStep === 2 && (
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
-            Rules of the Quiz
-          </h1>
-          <div className="flex justify-center mb-8">
-            <span className="text-6xl">📜</span>
+        {/* Step 1: Welcome */}
+        {currentStep === 1 && (
+          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
+              Welcome to the Ceremony
+            </h1>
+            <div className="flex justify-center mb-8">
+              <span className="text-6xl">🎉</span>
+            </div>
+            <h2 className="text-6xl font-semibold text-indigo-700 mb-4">
+              Introduction
+            </h2>
+            <p className="text-gray-700 mb-4">{introduction}</p>
+            <p className="text-gray-700 mb-6">
+              Before we begin, we'd like to thank everyone for participating and
+              bringing your enthusiasm to make this ceremony a success. The quiz
+              is designed to be both entertaining and informative, so get ready
+              for some fun challenges ahead!
+            </p>
+            <div className="flex justify-end">
+              <button
+                onClick={nextStep}
+                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+              >
+                Continue to Rules
+              </button>
+            </div>
           </div>
-          <h2 className="text-xl font-semibold text-indigo-700 mb-4">
-            Please Read Carefully
-          </h2>
-          <p className="text-gray-700 mb-4">
-            To ensure everyone has a fair and enjoyable experience, please
-            follow these simple rules:
-          </p>
-          <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-2">
-            <li>
-              The quiz consists of {questions.length} multiple-choice questions
-            </li>
-            <li>Each question has a time limit shown on the timer</li>
-            <li>Each question is worth points based on difficulty</li>
-            <li>Choose your answer within the time limit</li>
-            <li>You can't go back to previous questions once answered</li>
-            <li>Your final score will be revealed at the end</li>
-            <li>Have fun and do your best!</li>
-          </ul>
-          <div className="flex justify-between">
-            <button
-              onClick={prevStep}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
-            >
-              Back
-            </button>
-            <button
-              onClick={nextStep}
-              className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
-            >
-              Start Quiz
-            </button>
-          </div>
-        </div>
-      )}
+        )}
 
-      {/* Step 3: Quiz */}
-      {currentStep === 3 && (
-        <div className="p-4">
-          <h2 className="text-2xl font-bold mb-6">Quiz Questions</h2>
+        {/* Step 2: Rules */}
+        {currentStep === 2 && (
+          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
+              Rules of the Quiz
+            </h1>
+            <div className="flex justify-center mb-8">
+              <span className="text-6xl">📜</span>
+            </div>
+            <h2 className="text-xl font-semibold text-indigo-700 mb-4">
+              Please Read Carefully
+            </h2>
+            <p className="text-gray-700 mb-4">
+              To ensure everyone has a fair and enjoyable experience, please
+              follow these simple rules:
+            </p>
+            <h1 className="text-xl mb-4">
+              The quiz consists of {questions.length} questions
+            </h1>
 
-          {/* Questions Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
-            {questions
-              .filter((q) => !attemptedQuestions.includes(q.id))
-              .map((question) => (
-                <div
-                  key={question.id}
-                  onClick={() => handleQuestionClick(question)}
-                  className="aspect-square flex items-center justify-center bg-white border rounded-lg shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
-                >
-                  <span className="text-2xl font-bold">
-                    Q{question.questionNumber}
-                  </span>
+            <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-2">
+              {rules.length > 0 && (
+                <div className="mb-4">
+                  <ul className="list-disc list-inside text-gray-700">
+                    {rules.map((rule, index) => (
+                      <li key={index}>{rule}</li>
+                    ))}
+                  </ul>
                 </div>
+              )}
+            </ul>
+            <div className="flex justify-between">
+              <button
+                onClick={prevStep}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+              >
+                Back
+              </button>
+              <button
+                onClick={nextStep}
+                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+              >
+                Participants
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Participant */}
+        {currentStep === 3 && (
+          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
+              Participants of the Quiz
+            </h1>
+
+            <div className="flex flex-col gap-4 mb-6 items-center">
+              {participants.map((participant, index) => (
+              <button
+                key={index}
+                onClick={() => console.log(`Selected participant: ${participant}`)}
+                className="px-4 py-2 w-1/2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+              >
+                {participant}
+              </button>
               ))}
+            </div>
+            <div className="flex justify-between">
+              <button
+                onClick={prevStep}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+              >
+                Back
+              </button>
+              <button
+                onClick={nextStep}
+                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+              >
+                Start Quiz
+              </button>
+            </div>
           </div>
+        )}
 
-          {attemptedQuestions.length > 0 && (
-            <>
-              <h3 className="text-xl font-semibold mb-2">
-                Attempted Questions
-              </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
-                {questions
-                  .filter((q) => attemptedQuestions.includes(q.id))
-                  .map((question) => (
-                    <div
-                      key={question.id}
-                      className="aspect-square flex items-center justify-center bg-gray-100 text-gray-500 border rounded-lg shadow-sm"
-                    >
-                      <span className="text-2xl font-bold">
-                        Q{question.questionNumber}
-                      </span>
-                    </div>
-                  ))}
-              </div>
-            </>
-          )}
+        {/* Step 4: Quiz */}
+        {currentStep === 4 && (
+          <div className="p-4">
+            <h2 className="text-2xl font-bold mb-6">Quiz Questions</h2>
 
-          {/* Question Details Modal */}
-          {selectedQuestion && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-8 z-10">
-              <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                <div className="p-4 border-b flex justify-between items-center">
-                  <h3 className="text-xl font-bold">
-                    Question {selectedQuestion.questionNumber}
-                  </h3>
-                  <button
-                    onClick={closeQuestionDetails}
-                    className="p-1 rounded-full hover:bg-gray-100"
+            {/* Questions Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
+              {questions
+                .filter((q) => !attemptedQuestions.includes(q.id))
+                .map((question) => (
+                  <div
+                    key={question.id}
+                    onClick={() => handleQuestionClick(question)}
+                    className="aspect-square flex items-center justify-center bg-white border rounded-lg shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
                   >
-                    <X className="h-5 w-5" />
-                  </button>
-                </div>
-                <div>
-                  <div className="flex flex-col items-center justify-center bg-gradient-to-r from-blue-50 to-indigo-50 p-6 mb-6">
-                    <div className="text-sm font-medium text-gray-500 mb-2">
-                      TIME REMAINING
-                    </div>
-                    <div className="flex items-center">
-                      <Clock className="h-8 w-8 mr-3 text-indigo-600" />
-                      <span className="text-5xl font-bold text-indigo-700">
-                        {timeLeft}
-                      </span>
-                      <span className="text-2xl font-semibold text-indigo-600 ml-2">
-                        seconds
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-100 rounded-full  mt-4">
-                      <div
-                        className="bg-indigo-600 h-2 rounded-full transition-all duration-1000"
-                        style={{
-                          width: `${
-                            ((timeLeft ?? 0) /
-                              (selectedQuestion?.timeLimit ?? 1)) *
-                            100
-                          }%`,
-                        }}
-                      ></div>
+                    <span className="text-2xl font-bold">
+                      Q{question.questionNumber}
+                    </span>
+                  </div>
+                ))}
+            </div>
 
-                      <div className="flex items-center justify-center">
-                        {timeSpent !== null && (
-                          <div className="mt-3 text-sm text-indigo-700">
-                            You spent{" "}
-                            <span className="font-semibold">
-                              {timeSpent} seconds
-                            </span>{" "}
-                            answering.
-                          </div>
-                        )}
+            {attemptedQuestions.length > 0 && (
+              <>
+                <h3 className="text-xl font-semibold mb-2">
+                  Attempted Questions
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
+                  {questions
+                    .filter((q) => attemptedQuestions.includes(q.id))
+                    .map((question) => (
+                      <div
+                        key={question.id}
+                        className="aspect-square flex items-center justify-center bg-gray-100 text-gray-500 border rounded-lg shadow-sm"
+                      >
+                        <span className="text-2xl font-bold">
+                          Q{question.questionNumber}
+                        </span>
+                      </div>
+                    ))}
+                </div>
+              </>
+            )}
+
+            {/* Question Details Modal */}
+            {selectedQuestion && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-8 z-10">
+                <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                  <div className="p-4 border-b flex justify-between items-center">
+                    <h3 className="text-xl font-bold">
+                      Question {selectedQuestion.questionNumber}
+                    </h3>
+                    <button
+                      onClick={closeQuestionDetails}
+                      className="p-1 rounded-full hover:bg-gray-100"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+                  <div>
+                    <div className="flex flex-col items-center justify-center bg-gradient-to-r from-blue-50 to-indigo-50 p-6 mb-6">
+                      <div className="text-sm font-medium text-gray-500 mb-2">
+                        TIME REMAINING
+                      </div>
+                      <div className="flex items-center">
+                        <Clock className="h-8 w-8 mr-3 text-indigo-600" />
+                        <span className="text-5xl font-bold text-indigo-700">
+                          {timeLeft}
+                        </span>
+                        <span className="text-2xl font-semibold text-indigo-600 ml-2">
+                          seconds
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-100 rounded-full  mt-4">
+                        <div
+                          className="bg-indigo-600 h-2 rounded-full transition-all duration-1000"
+                          style={{
+                            width: `${
+                              ((timeLeft ?? 0) /
+                                (selectedQuestion?.timeLimit ?? 1)) *
+                              100
+                            }%`,
+                          }}
+                        ></div>
+
+                        <div className="flex items-center justify-center">
+                          {timeSpent !== null && (
+                            <div className="mt-3 text-sm text-indigo-700">
+                              You spent{" "}
+                              <span className="font-semibold">
+                                {timeSpent} seconds
+                              </span>{" "}
+                              answering.
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-6">
+                    {/* Question text */}
+                    <div className="mb-6">
+                      <h4 className="text-sm font-medium text-gray-500 mb-1">
+                        Question
+                      </h4>
+                      <p className="text-lg">{selectedQuestion.questionText}</p>
+                    </div>
+
+                    {/* Answer */}
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500 mb-1">
+                        Answer
+                      </h4>
+                      {!showAnswer ? (
+                        <button
+                          onClick={handleShowAnswer}
+                          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                          Show Answer
+                        </button>
+                      ) : (
+                        <p className="p-3 bg-green-50 border border-green-100 rounded-md mt-2">
+                          {selectedQuestion.answer}
+                        </p>
+                      )}
+
+                      {/* score */}
+                      <div className="flex gap-2 mt-4">
+                        {[0.5, 1.0, 1.5, 2.0].map((val) => (
+                          <Button
+                            key={val}
+                            onClick={() =>
+                              handleScore(selectedQuestion.id, val)
+                            }
+                            variant={
+                              scores[selectedQuestion.id] === val
+                                ? "default"
+                                : "outline"
+                            }
+                          >
+                            {val}
+                          </Button>
+                        ))}
                       </div>
                     </div>
                   </div>
                 </div>
-
-                <div className="p-6">
-                  {/* Question stats */}
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="flex items-center">
-                      <Award className="h-4 w-4 mr-1 text-gray-500" />
-                      <span>{selectedQuestion.points} points</span>
-                    </div>
-                  </div>
-
-                  {/* Question text */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-medium text-gray-500 mb-1">
-                      Question
-                    </h4>
-                    <p className="text-lg">{selectedQuestion.questionText}</p>
-                  </div>
-
-                  {/* Answer */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-500 mb-1">
-                      Answer
-                    </h4>
-                    {!showAnswer ? (
-                      <button
-                        onClick={handleShowAnswer}
-                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                      >
-                        Show Answer
-                      </button>
-                    ) : (
-                      <p className="p-3 bg-green-50 border border-green-100 rounded-md mt-2">
-                        {selectedQuestion.answer}
-                      </p>
-                    )}
-                  </div>
-                </div>
               </div>
-            </div>
-          )}
-        </div>
-      )}
-
-
-
-       {/* Step 4: Results */}
-       {currentStep === 4 && (
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Quiz Results</h1>
-          <div className="text-center mb-6">
-            <span className="text-6xl">🎊</span>
-          </div>
-          <div className="text-center mb-6">
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">Your Score</h3>
-            {/* <p className="text-4xl font-bold text-indigo-700">
-              {score} / {questions.reduce((total, q) => total + q.points, 0)} points
-            </p> */}
-          </div>
-          {/* <div className="text-center mb-8">
-            {score === questions.reduce((total, q) => total + q.points, 0) ? (
-              <p className="text-lg text-gray-700">Perfect score! You're a ceremony expert!</p>
-            ) : score > questions.reduce((total, q) => total + q.points, 0) / 2 ? (
-              <p className="text-lg text-gray-700">Great job! You know your ceremony traditions well!</p>
-            ) : (
-              <p className="text-lg text-gray-700">Thanks for participating! You've learned some new ceremony facts today.</p>
             )}
-          </div> */}
-          <div className="flex justify-center space-x-4">
-            <button 
-              // onClick={restartQuiz} 
-              className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
-            >
-              Restart Quiz
-            </button>
-            <button 
-              onClick={goToWelcome} 
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
-            >
-              Back to Welcome
-            </button>
           </div>
-        </div>
-      )}
+        )}
 
-    </div>
+        {/* Step 5: Results */}
+        {currentStep === 5 && (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
+              Quiz Results
+            </h1>
+            <div className="text-center mb-6">
+              <span className="text-6xl">🎊</span>
+            </div>
+            <div className="text-center mb-6">
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                Your Score
+              </h3>
+              <p className="text-4xl font-bold text-indigo-700">
+                {totalScore} / {questions.length * 2}{" "}
+                {/* assuming 2 is the max score per question */}
+              </p>
+              <p className="text-lg text-gray-700">
+                Thanks for participating! You've learned some new ceremony facts
+                today.
+              </p>
+            </div>
+
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={restartQuiz}
+                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+              >
+                Restart Quiz
+              </button>
+              <button
+                onClick={goToWelcome}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+              >
+                Back to Welcome
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 

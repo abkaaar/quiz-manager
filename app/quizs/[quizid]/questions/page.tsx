@@ -30,7 +30,6 @@ interface Question {
   id: string;
   questionText: string;
   timeLimit: number;
-  points: number;
   answer: string;
   questionNumber: number;
 }
@@ -74,7 +73,6 @@ const QuestionComponent = () => {
     await updateDoc(questionRef, {
       questionText: editedQuestion.questionText,
       timeLimit: editedQuestion.timeLimit,
-      points: editedQuestion.points,
     });
 
     setQuestions((prev) =>
@@ -114,17 +112,7 @@ const QuestionComponent = () => {
                   }
                   className="w-16 border rounded px-2 py-1 text-sm mr-2"
                 />
-                <input
-                  type="number"
-                  value={editedQuestion.points ?? ""}
-                  onChange={(e) =>
-                    setEditedQuestion({
-                      ...editedQuestion,
-                      points: Number(e.target.value),
-                    })
-                  }
-                  className="w-16 border rounded px-2 py-1 text-sm"
-                />
+             
               </>
             ) : (
               <>
@@ -136,36 +124,10 @@ const QuestionComponent = () => {
                     <ChevronDown className="h-4 w-4 ml-1" />
                   </button>
                 </div>
-
-                {/* Points button */}
-                <div className="ml-2 relative">
-                  <button className="flex items-center px-3 py-1 border rounded-md text-sm">
-                    <Award className="h-4 w-4 mr-1 text-gray-500" />
-                    {question.points}
-                    <ChevronDown className="h-4 w-4 ml-1" />
-                  </button>
-                </div>
               </>
             )}
 
-            {/* Time dropdown */}
-            {/* <div className="ml-4 relative">
-              <button className="flex items-center px-3 py-1 border rounded-md text-sm">
-                <Clock className="h-4 w-4 mr-1 text-gray-500" />
-                {question.timeLimit}
-                <ChevronDown className="h-4 w-4 ml-1" />
-              </button>
-            </div> */}
-
-            {/* Points dropdown */}
-
-            {/* <div className="ml-2 relative">
-              <button className="flex items-center px-3 py-1 border rounded-md text-sm">
-                <Award className="h-4 w-4 mr-1 text-gray-500" />
-                {question.points}
-                <ChevronDown className="h-4 w-4 ml-1" />
-              </button>
-            </div> */}
+         
 
             {/* Spacer */}
             <div className="flex-grow"></div>
@@ -201,7 +163,6 @@ const QuestionComponent = () => {
                   setEditedQuestion({
                     questionText: question.questionText,
                     timeLimit: question.timeLimit,
-                    points: question.points,
                   });
                 }}
                 className="p-2 ml-1 hover:bg-gray-100 rounded"
@@ -241,18 +202,7 @@ const QuestionComponent = () => {
               </div>
             </div>
           </div>
-          {/* <div className="p-6">
-            <h3 className="text-lg font-medium mb-4">
-              {question.questionText}
-            </h3>
-            <div>
-              <p className="text-gray-600 mb-2">Answer</p>
-              <div className="flex items-center">
-                <Check className="h-5 w-5 text-green-500 mr-2" />
-                <p>{question.answer}</p>
-              </div>
-            </div>
-          </div> */}
+          
         </div>
       ))}
     </div>

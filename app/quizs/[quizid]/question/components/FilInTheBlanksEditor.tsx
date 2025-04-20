@@ -28,7 +28,6 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
 
   const [questionText, setQuestionText] = useState("");
   const [answer, setAnswer] = useState("");
-  const [points, setPoints] = useState(0);
   const [timeLimit, setTimeLimit] = useState(0);
 
   const saveQuestion = async () => {
@@ -47,7 +46,6 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
         type: "question-and-answer",
         questionText,
         answer,
-        points,
         timeLimit,
         questionNumber, 
         createdAt: serverTimestamp(),
@@ -86,8 +84,6 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
   return (
     <div className="bg-gray-100 min-h-screen">
       <QuestionEditorHeader
-        points={points}
-        onPointsChange={setPoints}
         timeLimit={timeLimit}
         onTimeLimitChange={setTimeLimit}
         isRequired={false}

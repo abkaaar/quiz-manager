@@ -64,7 +64,6 @@ const QuizDetail = () => {
   const [grade, setGrade] = useState(quiz?.grade || "");
   const [image, setImage] = useState<File | null>(null);
 
-  // For react-router-dom: const navigate = useNavigate();
 
   // Function to handle navigation when quiz type is selected
   const handleQuizTypeSelect = async (quizType: string) => {

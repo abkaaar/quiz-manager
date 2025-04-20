@@ -1,12 +1,37 @@
-node_modules
-
-# Ignore node_modules folder
+# Node modules
 node_modules/
 
-# Ignore environment files
-.env
-firebase.json
+# Build output
+dist/
+build/
+out/
+.next/
+.vite/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 firebase-debug.log
 
-# Ignore build outputs
-dist/
+# Environment files
+.env
+.env.*  # includes .env.local, .env.production, etc.
+
+# Firebase config
+firebase.json
+.firebaserc
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# TypeScript cache
+*.tsbuildinfo
+
+#

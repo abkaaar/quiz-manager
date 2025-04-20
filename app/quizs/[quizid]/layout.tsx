@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -29,6 +29,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "@/utils/firebase";
 
 // Quiz admin specific components
 const BulkUpdateForm = () => (
@@ -64,28 +66,117 @@ const BulkUpdateForm = () => (
   </Card>
 );
 
-const IntroductionForm = () => (
-  <Card className="mb-4">
-    <CardHeader className="pb-2">
-      <CardTitle className="text-sm font-medium">
-        Introduction
-      </CardTitle>
-    </CardHeader>
-    <CardContent>
-      <div className="space-y-2">
-        <textarea
-          className="w-full rounded border p-2 bg-white"
-          placeholder="Add or edit the introduction text here..."
-          rows={4}
-        ></textarea>
-      </div>
-    </CardContent>
-  </Card>
-);
+const IntroductionForm = () => {
+  const [introduction, setIntroduction] = useState("");
+  const [loading, setLoading] = useState(false);
+  const params = useParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchIntroduction = async () => {
+      if (!params.quizid) return;
+
+      const docRef = doc(db, "quizzes", Array.isArray(params.quizid) ? params.quizid[0] : params.quizid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.introduction) {
+          setIntroduction(data.introduction);
+        }
+      }
+    };
+
+    fetchIntroduction();
+  }, [params.quizid]);
+
+  const saveIntroduction = async () => {
+    if (!params.quizid) {
+      alert("Quiz ID is missing.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await setDoc(
+        doc(db, "quizzes", Array.isArray(params.quizid) ? params.quizid[0] : params.quizid),
+        { introduction },
+        { merge: true }
+      );
+      alert("Introduction saved!");
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Failed to save introduction.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card className="mb-4">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium">Introduction</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          <textarea
+            className="w-full rounded border p-2 bg-white"
+            placeholder="Add or edit the introduction text here..."
+            rows={4}
+            value={introduction}
+            onChange={(e) => setIntroduction(e.target.value)}
+          />
+          <Button className="w-full" onClick={saveIntroduction} disabled={loading}>
+            {loading ? "Saving..." : "Save Introduction"}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 const RulesForm = () => {
   const [rules, setRules] = useState<string[]>([]);
   const [newRule, setNewRule] = useState("");
+  const [loading, setLoading] = useState(false);
+  const params = useParams();
+
+  useEffect(() => {
+    const fetchRules = async () => {
+      if (!params.quizid) return;
+
+      const docRef = doc(db, "quizzes", Array.isArray(params.quizid) ? params.quizid[0] : params.quizid);
+      const snap = await getDoc(docRef);
+
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data.rules && Array.isArray(data.rules)) {
+          setRules(data.rules);
+        }
+      }
+    };
+
+    fetchRules();
+  }, [params.quizid]);
+
+  const saveRules = async () => {
+    if (!params.quizid) return alert("Quiz ID missing.");
+
+    try {
+      setLoading(true);
+      await setDoc(
+        doc(db, "quizzes", Array.isArray(params.quizid) ? params.quizid[0] : params.quizid),
+        { rules },
+        { merge: true }
+      );
+      alert("Rules saved!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save rules.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const addRule = () => {
     if (newRule.trim()) {
@@ -106,20 +197,17 @@ const RulesForm = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          <div>
-            <input
-              type="text"
-              className="w-full rounded border p-2 bg-white"
-              placeholder="Write a rule..."
-              value={newRule}
-              onChange={(e) => setNewRule(e.target.value)}
-            />
-          </div>
-          <div>
-            <Button className="w-full" onClick={addRule}>
-              Add Rule
-            </Button>
-          </div>
+          <input
+            type="text"
+            className="w-full rounded border p-2 bg-white"
+            placeholder="Write a rule..."
+            value={newRule}
+            onChange={(e) => setNewRule(e.target.value)}
+          />
+          <Button className="w-full" onClick={addRule}>
+            Add Rule
+          </Button>
+
           <ul className="space-y-1">
             {rules.map((rule, index) => (
               <li
@@ -137,15 +225,59 @@ const RulesForm = () => {
               </li>
             ))}
           </ul>
+
+          <Button className="w-full mt-2" onClick={saveRules} disabled={loading}>
+            {loading ? "Saving..." : "Save Rules"}
+          </Button>
         </div>
       </CardContent>
     </Card>
   );
 };
 
+
 const ParticipantForm = () => {
   const [participants, setParticipants] = useState<string[]>([]);
   const [newParticipant, setNewParticipant] = useState("");
+  const [loading, setLoading] = useState(false);
+  const params = useParams();
+
+  useEffect(() => {
+    const fetchParticipant = async () => {
+      if (!params.quizid) return;
+
+      const docRef = doc(db, "quizzes", Array.isArray(params.quizid) ? params.quizid[0] : params.quizid);
+      const snap = await getDoc(docRef);
+
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data.participants && Array.isArray(data.participants)) {
+          setParticipants(data.participants);
+        }
+      }
+    };
+
+    fetchParticipant();
+  }, [params.quizid]);
+
+  const saveParticipant = async () => {
+    if (!params.quizid) return alert("Quiz ID missing.");
+
+    try {
+      setLoading(true);
+      await setDoc(
+        doc(db, "quizzes", Array.isArray(params.quizid) ? params.quizid[0] : params.quizid),
+        { participants },
+        { merge: true }
+      );
+      alert("Participant saved!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save rules.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const addParticipant = () => {
     if (newParticipant.trim()) {
@@ -154,7 +286,7 @@ const ParticipantForm = () => {
     }
   };
 
-  const removeRule = (index: number) => {
+  const removeParticipant = (index: number) => {
     setParticipants(participants.filter((_, i) => i !== index));
   };
 
@@ -190,13 +322,16 @@ const ParticipantForm = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => removeRule(index)}
+                  onClick={() => removeParticipant(index)}
                 >
                   ✕
                 </Button>
               </li>
             ))}
           </ul>
+          <Button className="w-full mt-2" onClick={saveParticipant} disabled={loading}>
+            {loading ? "Saving..." : "Save Participant"}
+          </Button>
         </div>
       </CardContent>
     </Card>
