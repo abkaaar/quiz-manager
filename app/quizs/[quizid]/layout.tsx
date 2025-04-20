@@ -29,42 +29,84 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, setDoc, where, writeBatch } from "firebase/firestore";
 import { db } from "@/utils/firebase";
 
 // Quiz admin specific components
-const BulkUpdateForm = () => (
-  <Card className="mb-4">
-    <CardHeader className="pb-2">
-      <CardTitle className="text-sm font-medium">
-        Bulk Time Update
-      </CardTitle>
-      <CardDescription>Update time for all questions at once</CardDescription>
-    </CardHeader>
-    <CardContent>
-      <div className="space-y-2">
-        <div className="grid grid-cols-1 gap-2">
-     
-          <div>
-            <select
-              className="w-full rounded border p-2 bg-white"
-              defaultValue=""
-            >
-              <option value="" disabled>
-                Select time
-              </option>
-              <option value="30">30 seconds</option>
-              <option value="45">45 seconds</option>
-              <option value="60">60 seconds</option>
-              <option value="90">90 seconds</option>
-              <option value="120">2 minutes</option>
-            </select>
+const BulkTimeUpdate = () => {
+  const [timeLimit, setTimeLimit] = useState("");
+  const [loading, setLoading] = useState(false);
+  const params = useParams();
+
+  const updateAllQuestionsTime = async () => {
+    if (!params.quizid) return alert("Quiz ID is missing.");
+    if (!timeLimit) return alert("Please select a time.");
+  
+    try {
+      setLoading(true);
+      const q = query(collection(db, "questions"), where("quizId", "==", params.quizid));
+      const snapshot = await getDocs(q);
+  
+      if (snapshot.empty) {
+        alert("No questions found to update.");
+        return;
+      }
+  
+      const batch = writeBatch(db);
+      snapshot.docs.forEach((docSnap) => {
+        const questionRef = doc(db, "questions", docSnap.id);
+        batch.update(questionRef, { timeLimit: Number(timeLimit) }); // convert to number
+      });
+  
+      await batch.commit();
+      alert("Time updated for all questions!");
+    } catch (error) {
+      console.error("Error updating time:", error);
+      alert("Failed to update time.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
+  return (
+    <Card className="mb-4">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium">Bulk Time Update</CardTitle>
+        <CardDescription>Update time for all questions at once</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          <div className="grid grid-cols-1 gap-2">
+            <div>
+              <select
+                className="w-full rounded border p-2 bg-white"
+                value={timeLimit}
+                onChange={(e) => setTimeLimit(e.target.value)}
+              >
+                <option value="" disabled>
+                  Select time
+                </option>
+                <option value="30">30 seconds</option>
+                <option value="45">45 seconds</option>
+                <option value="60">60 seconds</option>
+                <option value="90">90 seconds</option>
+                <option value="120">2 minutes</option>
+              </select>
+            </div>
           </div>
+          <Button
+            className="w-full"
+            onClick={updateAllQuestionsTime}
+            disabled={loading}
+          >
+            {loading ? "Updating..." : "Update Time"}
+          </Button>
         </div>
-      </div>
-    </CardContent>
-  </Card>
-);
+      </CardContent>
+    </Card>
+  );
+};
 
 const IntroductionForm = () => {
   const [introduction, setIntroduction] = useState("");
@@ -339,44 +381,6 @@ const ParticipantForm = () => {
 };
 
 
-
-
-
-// const ImportOptions = () => (
-//   <Card>
-//     <CardHeader className="pb-2">
-//       <CardTitle className="text-sm font-medium">Import Questions</CardTitle>
-//       <CardDescription>Add questions from external sources</CardDescription>
-//     </CardHeader>
-//     <CardContent className="space-y-2">
-//       <Button
-//         variant="outline"
-//         className="w-full flex items-center justify-start gap-2"
-//         size="sm"
-//       >
-//         <FileText className="h-4 w-4" />
-//         <span>From CSV</span>
-//       </Button>
-//       <Button
-//         variant="outline"
-//         className="w-full flex items-center justify-start gap-2"
-//         size="sm"
-//       >
-//         <Database className="h-4 w-4" />
-//         <span>From Question Bank</span>
-//       </Button>
-//       <Button
-//         variant="outline"
-//         className="w-full flex items-center justify-start gap-2"
-//         size="sm"
-//       >
-//         <Import className="h-4 w-4" />
-//         <span>From Another Quiz</span>
-//       </Button>
-//     </CardContent>
-//   </Card>
-// );
-
 export default function QuizAdminLayout({
   children,
 }: {
@@ -430,7 +434,7 @@ export default function QuizAdminLayout({
         <ScrollArea className="h-[calc(100vh-4rem)]">
           {isSidebarOpen ? (
             <div className="p-4">
-              <BulkUpdateForm />
+              <BulkTimeUpdate />
               <IntroductionForm/>
               <RulesForm/>
               <ParticipantForm/>
@@ -484,7 +488,7 @@ export default function QuizAdminLayout({
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <BulkUpdateForm />
+                    <BulkTimeUpdate />
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>

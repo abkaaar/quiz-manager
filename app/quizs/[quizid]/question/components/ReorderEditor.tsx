@@ -28,11 +28,9 @@ export const ReorderEditor: React.FC<ReorderEditorProps> = (
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      <QuestionEditorHeader questionType="Reorder" icon={<ArrowDownUp className="h-3 w-3" />} />
       
       {/* Question content area */}
       <div className="max-w-5xl mx-auto mt-4">
-        <QuestionContentArea />
         
         {/* Answer options */}
         <div className="grid grid-cols-1 gap-3 mt-4">
@@ -79,7 +77,6 @@ export const ReorderEditor: React.FC<ReorderEditorProps> = (
         </div>
       </div>
       
-      <HelpButton />
     </div>
   );
 };
