@@ -28,7 +28,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import SampleQuiz from "@/components/Samplequiz";
 import { db, storage } from "@/utils/firebase";
 import {
   getAuth,
@@ -36,6 +35,7 @@ import {
   signOut as firebaseSignOut,
   User,
 } from "firebase/auth";
+import Image from "next/image";
 
 const QuizsPage = () => {
   const { toast } = useToast();
@@ -167,7 +167,7 @@ const QuizsPage = () => {
     });
   
     return () => unsubscribe(); // Cleanup the listener when component unmounts
-  }, []);
+  }, [toast]);
   
 
   return (
@@ -269,7 +269,7 @@ const QuizsPage = () => {
                     </div>
                     {image && (
                       <div className="mt-2">
-                        <img
+                        <Image
                           src="/api/placeholder/200/150"
                           alt="Cover preview"
                           className="w-full h-32 object-cover rounded-md"
@@ -305,7 +305,7 @@ const QuizsPage = () => {
               >
                 <div className="h-48 bg-gray-200">
                   {quiz.imageUrl ? (
-                    <img
+                    <Image
                       src={quiz.imageUrl}
                       alt={quiz.name}
                       className="w-full h-full object-cover"
@@ -342,7 +342,6 @@ const QuizsPage = () => {
             </div>
           )}
         </div>
-        <SampleQuiz />
       </section>
       <Footer />
     </div>

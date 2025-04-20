@@ -116,26 +116,6 @@ const QuizDetail = () => {
       setLoading(false);
       return;
     }
-
-    // const fetchQuiz = async () => {
-    //   setLoading(true);
-    //   setError(null);
-    //   try {
-    //     const docRef = doc(db, "quizzes", id);
-    //     const docSnap = await getDoc(docRef);
-
-    //     if (docSnap.exists()) {
-    //       setQuiz({ id: docSnap.id, ...docSnap.data() } as Quiz);
-    //     } else {
-    //       setError("Quiz not found.");
-    //     }
-    //   } catch (error) {
-    //     console.error("Error fetching quiz:", error);
-    //     setError("Failed to load quiz.");
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
     const fetchQuiz = async () => {
       setLoading(true);
       setError(null);

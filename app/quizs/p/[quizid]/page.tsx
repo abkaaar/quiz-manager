@@ -43,6 +43,8 @@ const ParticipantQuestions = () => {
   const [participants, setParticipants] = useState<string[]>([]);
   const [rules, setRules] = useState<string[]>([]);
 
+  const [showScoreModal, setShowScoreModal] = useState(false);
+
   const timerRef = React.useRef<NodeJS.Timeout | null>(null);
   const params = useParams();
   const quizId = params.quizid as string;
@@ -76,8 +78,8 @@ const ParticipantQuestions = () => {
 
   // Show results when all questions are attempted
   useEffect(() => {
-    if (allQuestionsAttempted && currentStep === 4 && showAnswer) {
-      setCurrentStep(5);
+    if (allQuestionsAttempted && currentStep === 3 && showAnswer) {
+      setCurrentStep(4);
     }
   }, [allQuestionsAttempted, currentStep, showAnswer]);
 
@@ -132,6 +134,11 @@ const ParticipantQuestions = () => {
     setTimeLeft(question.timeLimit);
     setStartTime(Date.now()); // capture the start time
     setTimeSpent(null); // reset time spent
+
+    // Add the question ID to the attemptedQuestions array if not already present
+  if (!attemptedQuestions.includes(question.id)) {
+    setAttemptedQuestions((prev) => [...prev, question.id]);
+  }
   };
 
   const closeQuestionDetails = () => {
@@ -151,13 +158,14 @@ const ParticipantQuestions = () => {
     };
   }, [selectedQuestion, timeLeft, showAnswer]);
 
+ 
   const handleShowAnswer = () => {
     if (selectedQuestion && startTime) {
       if (timerRef.current) clearInterval(timerRef.current);
       const spent = Math.floor((Date.now() - startTime) / 1000);
       setTimeSpent(spent);
       setShowAnswer(true);
-      setAttemptedQuestions((prev) => [...prev, selectedQuestion.id]);
+  
     }
   };
 
@@ -207,7 +215,7 @@ const ParticipantQuestions = () => {
             </h2>
             <p className="text-gray-700 mb-4">{introduction}</p>
             <p className="text-gray-700 mb-6">
-              Before we begin, we'd like to thank everyone for participating and
+              Before we begin, we will like to thank everyone for participating and
               bringing your enthusiasm to make this ceremony a success. The quiz
               is designed to be both entertaining and informative, so get ready
               for some fun challenges ahead!
@@ -309,7 +317,49 @@ const ParticipantQuestions = () => {
         {/* Step 4: Quiz */}
         {currentStep === 4 && (
           <div className="p-4">
-            <h2 className="text-2xl font-bold mb-6">Quiz Questions</h2>
+      <div className="flex justify-between">
+      <h2 className="text-2xl font-bold mb-6">Quiz Questions</h2>
+      <Button onClick={() => setShowScoreModal(true)}>Show Score</Button>
+      </div>
+
+      {showScoreModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+      <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
+        Quiz Results
+      </h1>
+      <div className="text-center mb-6">
+        <span className="text-6xl">🎊</span>
+      </div>
+      <div className="text-center mb-6">
+        <h3 className="text-xl font-semibold text-gray-700 mb-2">Your Score</h3>
+        <p className="text-4xl font-bold text-indigo-700">
+          {totalScore} / {questions.length * 2}
+        </p>
+        <p className="text-lg text-gray-700">
+          Thanks for participating! You have learned some new facts today.
+        </p>
+      </div>
+
+      <div className="flex justify-center space-x-4">
+        <button
+          onClick={restartQuiz}
+          className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+        >
+          Restart Quiz
+        </button>
+        <button
+         onClick={() => setShowScoreModal(false)}
+          className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+ 
+
 
             {/* Questions Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
@@ -459,45 +509,7 @@ const ParticipantQuestions = () => {
           </div>
         )}
 
-        {/* Step 5: Results */}
-        {currentStep === 5 && (
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
-              Quiz Results
-            </h1>
-            <div className="text-center mb-6">
-              <span className="text-6xl">🎊</span>
-            </div>
-            <div className="text-center mb-6">
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                Your Score
-              </h3>
-              <p className="text-4xl font-bold text-indigo-700">
-                {totalScore} / {questions.length * 2}{" "}
-                {/* assuming 2 is the max score per question */}
-              </p>
-              <p className="text-lg text-gray-700">
-                Thanks for participating! You've learned some new ceremony facts
-                today.
-              </p>
-            </div>
-
-            <div className="flex justify-center space-x-4">
-              <button
-                onClick={restartQuiz}
-                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
-              >
-                Restart Quiz
-              </button>
-              <button
-                onClick={goToWelcome}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
-              >
-                Back to Welcome
-              </button>
-            </div>
-          </div>
-        )}
+      
       </div>
     </>
   );
