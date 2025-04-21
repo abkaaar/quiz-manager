@@ -8,12 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   MenuIcon,
-  Clock,
   Star,
-  Import,
-  Database,
-  FileText,
-  Settings,
   ArrowLeft,
 } from "lucide-react";
 import {
