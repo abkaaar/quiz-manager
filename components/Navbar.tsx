@@ -68,27 +68,27 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-4">
-        <DropdownMenu>
-  <DropdownMenuTrigger asChild>
-    <Button variant="ghost" className="flex items-center space-x-2">
-      <span>Use Cases</span>
-    </Button>
-  </DropdownMenuTrigger>
-  <DropdownMenuContent align="end">
-    <DropdownMenuItem>
-    <Brain className="h-4 w-4" />
-      <span>Competitions</span>
-    </DropdownMenuItem>
-    <DropdownMenuItem>
-      <span>Elementary</span>
-    </DropdownMenuItem>
-    <DropdownMenuItem>
-      <span>Secondary</span>
-    </DropdownMenuItem>
-  </DropdownMenuContent>
-</DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center space-x-2">
+                <span>Use Cases</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <Brain className="h-4 w-4" />
+                <span>Competitions</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <span>Elementary</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <span>Secondary</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Link href="/how-it-works">
-          <Button variant="ghost">How it works</Button>
+            <Button variant="ghost">How it works</Button>
           </Link>
         </nav>
 
@@ -153,14 +153,31 @@ const Navbar = () => {
           <SheetContent side="right" className="w-64">
             <div className="flex flex-col mt-8 space-y-4">
               <SheetClose asChild>
-                <Button variant="ghost" className="justify-start">
-                  Features
-                </Button>
+              <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center space-x-2">
+                <span>Use Cases</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <Brain className="h-4 w-4" />
+                <span>Competitions</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <span>Elementary</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <span>Secondary</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        
               </SheetClose>
               <SheetClose asChild>
-                <Button variant="ghost" className="justify-start">
-                  How it works
-                </Button>
+              <Link href="/how-it-works">
+            <Button variant="ghost">How it works</Button>
+          </Link>
               </SheetClose>
 
               {/* Mobile Auth Buttons */}
