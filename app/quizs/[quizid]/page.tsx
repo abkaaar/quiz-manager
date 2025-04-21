@@ -244,7 +244,7 @@ const QuizDetail = () => {
                   </Select>
                 </div>
               </div>
-              <DialogFooter className="">
+              <DialogFooter className="flex gap-3">
                 <Button
                   variant="destructive"
                   size="sm"
@@ -260,9 +260,6 @@ const QuizDetail = () => {
             </DialogContent>
           </Dialog>
 
-          {/* <Button variant={"outline"} size={"sm"} className="mr-2">
-            Preview
-          </Button> */}
           <Dialog>
             <DialogTrigger asChild>
               <Button
@@ -282,7 +279,9 @@ const QuizDetail = () => {
                 </p>
                 <Input
                   readOnly
-                  value={`http://localhost:3000/quizs/p/${quiz.id}`}
+                  value={`${
+                    process.env.DOMAIN_URL || "http://localhost:3000"
+                  }/quizs/p/${quiz.id}`}
                   className="w-full"
                 />
               </div>
@@ -291,7 +290,7 @@ const QuizDetail = () => {
                   size="sm"
                   onClick={() =>
                     navigator.clipboard.writeText(
-                      `http://localhost:3000/quizs/p/${quiz.id}`
+                      `${process.env.DOMAIN_URL || "http://localhost:3000"}/quizs/p/${quiz.id}`
                     )
                   }
                 >

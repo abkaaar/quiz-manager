@@ -6,11 +6,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  MenuIcon,
-  Star,
-  ArrowLeft,
-} from "lucide-react";
+import { MenuIcon, ArrowLeft } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -24,7 +20,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { collection, doc, getDoc, getDocs, query, setDoc, where, writeBatch } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+  writeBatch,
+} from "firebase/firestore";
 import { db } from "@/utils/firebase";
 
 // Quiz admin specific components
@@ -36,23 +41,26 @@ const BulkTimeUpdate = () => {
   const updateAllQuestionsTime = async () => {
     if (!params.quizid) return alert("Quiz ID is missing.");
     if (!timeLimit) return alert("Please select a time.");
-  
+
     try {
       setLoading(true);
-      const q = query(collection(db, "questions"), where("quizId", "==", params.quizid));
+      const q = query(
+        collection(db, "questions"),
+        where("quizId", "==", params.quizid)
+      );
       const snapshot = await getDocs(q);
-  
+
       if (snapshot.empty) {
         alert("No questions found to update.");
         return;
       }
-  
+
       const batch = writeBatch(db);
       snapshot.docs.forEach((docSnap) => {
         const questionRef = doc(db, "questions", docSnap.id);
         batch.update(questionRef, { timeLimit: Number(timeLimit) }); // convert to number
       });
-  
+
       await batch.commit();
       alert("Time updated for all questions!");
     } catch (error) {
@@ -62,7 +70,6 @@ const BulkTimeUpdate = () => {
       setLoading(false);
     }
   };
-  
 
   return (
     <Card className="mb-4">
@@ -113,7 +120,11 @@ const IntroductionForm = () => {
     const fetchIntroduction = async () => {
       if (!params.quizid) return;
 
-      const docRef = doc(db, "quizzes", Array.isArray(params.quizid) ? params.quizid[0] : params.quizid);
+      const docRef = doc(
+        db,
+        "quizzes",
+        Array.isArray(params.quizid) ? params.quizid[0] : params.quizid
+      );
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
@@ -136,7 +147,11 @@ const IntroductionForm = () => {
     try {
       setLoading(true);
       await setDoc(
-        doc(db, "quizzes", Array.isArray(params.quizid) ? params.quizid[0] : params.quizid),
+        doc(
+          db,
+          "quizzes",
+          Array.isArray(params.quizid) ? params.quizid[0] : params.quizid
+        ),
         { introduction },
         { merge: true }
       );
@@ -163,7 +178,11 @@ const IntroductionForm = () => {
             value={introduction}
             onChange={(e) => setIntroduction(e.target.value)}
           />
-          <Button className="w-full" onClick={saveIntroduction} disabled={loading}>
+          <Button
+            className="w-full"
+            onClick={saveIntroduction}
+            disabled={loading}
+          >
             {loading ? "Saving..." : "Save Introduction"}
           </Button>
         </div>
@@ -182,7 +201,11 @@ const RulesForm = () => {
     const fetchRules = async () => {
       if (!params.quizid) return;
 
-      const docRef = doc(db, "quizzes", Array.isArray(params.quizid) ? params.quizid[0] : params.quizid);
+      const docRef = doc(
+        db,
+        "quizzes",
+        Array.isArray(params.quizid) ? params.quizid[0] : params.quizid
+      );
       const snap = await getDoc(docRef);
 
       if (snap.exists()) {
@@ -202,7 +225,11 @@ const RulesForm = () => {
     try {
       setLoading(true);
       await setDoc(
-        doc(db, "quizzes", Array.isArray(params.quizid) ? params.quizid[0] : params.quizid),
+        doc(
+          db,
+          "quizzes",
+          Array.isArray(params.quizid) ? params.quizid[0] : params.quizid
+        ),
         { rules },
         { merge: true }
       );
@@ -263,7 +290,11 @@ const RulesForm = () => {
             ))}
           </ul>
 
-          <Button className="w-full mt-2" onClick={saveRules} disabled={loading}>
+          <Button
+            className="w-full mt-2"
+            onClick={saveRules}
+            disabled={loading}
+          >
             {loading ? "Saving..." : "Save Rules"}
           </Button>
         </div>
@@ -271,7 +302,6 @@ const RulesForm = () => {
     </Card>
   );
 };
-
 
 const ParticipantForm = () => {
   const [participants, setParticipants] = useState<string[]>([]);
@@ -283,7 +313,11 @@ const ParticipantForm = () => {
     const fetchParticipant = async () => {
       if (!params.quizid) return;
 
-      const docRef = doc(db, "quizzes", Array.isArray(params.quizid) ? params.quizid[0] : params.quizid);
+      const docRef = doc(
+        db,
+        "quizzes",
+        Array.isArray(params.quizid) ? params.quizid[0] : params.quizid
+      );
       const snap = await getDoc(docRef);
 
       if (snap.exists()) {
@@ -303,7 +337,11 @@ const ParticipantForm = () => {
     try {
       setLoading(true);
       await setDoc(
-        doc(db, "quizzes", Array.isArray(params.quizid) ? params.quizid[0] : params.quizid),
+        doc(
+          db,
+          "quizzes",
+          Array.isArray(params.quizid) ? params.quizid[0] : params.quizid
+        ),
         { participants },
         { merge: true }
       );
@@ -331,7 +369,9 @@ const ParticipantForm = () => {
     <Card className="mb-4">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium">Participant</CardTitle>
-        <CardDescription>Set the participant for the competition</CardDescription>
+        <CardDescription>
+          Set the participant for the competition
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
@@ -366,7 +406,11 @@ const ParticipantForm = () => {
               </li>
             ))}
           </ul>
-          <Button className="w-full mt-2" onClick={saveParticipant} disabled={loading}>
+          <Button
+            className="w-full mt-2"
+            onClick={saveParticipant}
+            disabled={loading}
+          >
             {loading ? "Saving..." : "Save Participant"}
           </Button>
         </div>
@@ -374,7 +418,6 @@ const ParticipantForm = () => {
     </Card>
   );
 };
-
 
 export default function QuizAdminLayout({
   children,
@@ -430,9 +473,9 @@ export default function QuizAdminLayout({
           {isSidebarOpen ? (
             <div className="p-4">
               <BulkTimeUpdate />
-              <IntroductionForm/>
-              <RulesForm/>
-              <ParticipantForm/>
+              <IntroductionForm />
+              <RulesForm />
+              <ParticipantForm />
             </div>
           ) : (
             <nav className="flex flex-col items-center gap-4 p-2">
@@ -442,7 +485,6 @@ export default function QuizAdminLayout({
                 className="h-8 w-8"
                 title="Bulk Operations"
               >
-                <Star className="h-4 w-4" />
               </Button>
             </nav>
           )}
@@ -478,12 +520,14 @@ export default function QuizAdminLayout({
                 <AccordionItem value="bulk-update">
                   <AccordionTrigger className="py-2">
                     <div className="flex items-center gap-2">
-                      <Star className="h-4 w-4" />
                       <span>Bulk Operations</span>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
                     <BulkTimeUpdate />
+                    <IntroductionForm />
+                    <RulesForm />
+                    <ParticipantForm />
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>

@@ -50,8 +50,7 @@ export default function Home() {
 
           {/* Subheading */}
           <p className="text-lg md:text-xl text-gray-600 mb-12">
-            Create and deliver bell-to-bell curriculum
-            resources that meet the needs of every student.
+            Create and share quizzes that meet the needs of every student.
           </p>
 
           {/* CTA Buttons */}
