@@ -110,7 +110,7 @@ const HowItWorksPage = () => {
                       <li>Welcome message for participants</li>
                       <li>Rules and instructions</li>
                       <li>Quiz access settings (public or private)</li>
-                      <li>Whether participants can see other's scores</li>
+                      <li>Whether participants can see others scores</li>
                     </ul>
                   </div>
                 </div>
@@ -185,7 +185,7 @@ const HowItWorksPage = () => {
                     <h4 className="text-lg font-medium mb-1">Join with Link or Code</h4>
                     <p className="text-gray-600">
                       Access the quiz by clicking the link provided by the quiz creator or enter the 
-                      access code on the join page. You'll first see a welcome screen explaining the 
+                      access code on the join page. You will first see a welcome screen explaining the 
                       quiz and its rules.
                     </p>
                   </div>
@@ -200,7 +200,7 @@ const HowItWorksPage = () => {
                   <div>
                     <h4 className="text-lg font-medium mb-1">Select Questions</h4>
                     <p className="text-gray-600">
-                      Once the quiz begins, you'll see a grid of available questions. Click on any 
+                      Once the quiz begins, you will see a grid of available questions. Click on any 
                       question to open it. Each question displays:
                     </p>
                     <ul className="list-disc ml-6 mt-2 space-y-1 text-gray-600">
@@ -222,7 +222,7 @@ const HowItWorksPage = () => {
                     <h4 className="text-lg font-medium mb-1">Answer Questions</h4>
                     <p className="text-gray-600">
                       Select your answer within the time limit. After submitting or when time runs out, 
-                      the correct answer will be revealed. You'll be able to see if you answered correctly 
+                      the correct answer will be revealed. You will be able to see if you answered correctly 
                       and how many points you earned.
                     </p>
                   </div>
@@ -247,8 +247,8 @@ const HowItWorksPage = () => {
                   <div>
                     <h4 className="text-lg font-medium mb-1">Track Your Progress</h4>
                     <p className="text-gray-600">
-                      As you answer questions, they'll move from the "Available Questions" to 
-                      "Attempted Questions" section. This helps you keep track of what you've completed.
+                      As you answer questions, they will move from the "Available Questions" to 
+                      "Attempted Questions" section. This helps you keep track of what you have completed.
                     </p>
                   </div>
                 </div>
@@ -262,7 +262,7 @@ const HowItWorksPage = () => {
                   <div>
                     <h4 className="text-lg font-medium mb-1">View Final Results</h4>
                     <p className="text-gray-600">
-                      After answering all questions, you'll see your final score and performance. If enabled by 
+                      After answering all questions, you will see your final score and performance. If enabled by 
                       the quiz creator, you might also see how your score compares to other participants.
                     </p>
                   </div>
