@@ -69,7 +69,7 @@ const HowItWorksPage = () => {
                   <div>
                     <h4 className="text-lg font-medium mb-1">Create a New Quiz</h4>
                     <p className="text-gray-600">
-                      Start by clicking "Create Quiz" from your dashboard. Give your quiz a title, 
+                      Start by clicking Create Quiz from your dashboard. Give your quiz a title, 
                       description, and optionally set a cover image for participants to recognize it.
                     </p>
                   </div>
@@ -134,7 +134,7 @@ const HowItWorksPage = () => {
                   <div>
                     <h4 className="text-lg font-medium mb-1">Generate Access Link</h4>
                     <p className="text-gray-600">
-                      Once your quiz is ready, generate a unique link or code from the "Share" tab.
+                      Once your quiz is ready, generate a unique link or code from the Share tab.
                       This link can be shared with participants via email, message, or displayed on a screen.
                     </p>
                   </div>
@@ -247,8 +247,8 @@ const HowItWorksPage = () => {
                   <div>
                     <h4 className="text-lg font-medium mb-1">Track Your Progress</h4>
                     <p className="text-gray-600">
-                      As you answer questions, they will move from the "Available Questions" to 
-                      "Attempted Questions" section. This helps you keep track of what you have completed.
+                      As you answer questions, they will move from the Available Questions to 
+                      Attempted Questions section. This helps you keep track of what you have completed.
                     </p>
                   </div>
                 </div>
