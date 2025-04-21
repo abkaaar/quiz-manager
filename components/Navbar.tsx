@@ -68,8 +68,28 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-4">
-          <Button variant="ghost">Features</Button>
+        <DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant="ghost" className="flex items-center space-x-2">
+      <span>Use Cases</span>
+    </Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent align="end">
+    <DropdownMenuItem>
+    <Brain className="h-4 w-4" />
+      <span>Competitions</span>
+    </DropdownMenuItem>
+    <DropdownMenuItem>
+      <span>Elementary</span>
+    </DropdownMenuItem>
+    <DropdownMenuItem>
+      <span>Secondary</span>
+    </DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+          <Link href="/how-it-works">
           <Button variant="ghost">How it works</Button>
+          </Link>
         </nav>
 
         {/* Authentication Buttons/Profile */}
