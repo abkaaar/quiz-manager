@@ -280,7 +280,7 @@ const QuizDetail = () => {
                 <Input
                   readOnly
                   value={`${
-                    process.env.DOMAIN_URL || "http://localhost:3000"
+                    process.env.NEXT_PUBLIC_DOMAIN_URL || "http://localhost:3000"
                   }/quizs/p/${quiz.id}`}
                   className="w-full"
                 />
@@ -290,7 +290,7 @@ const QuizDetail = () => {
                   size="sm"
                   onClick={() =>
                     navigator.clipboard.writeText(
-                      `${process.env.DOMAIN_URL || "http://localhost:3000"}/quizs/p/${quiz.id}`
+                      `${process.env.NEXT_PUBLIC_DOMAIN_URL || "http://localhost:3000"}/quizs/p/${quiz.id}`
                     )
                   }
                 >
