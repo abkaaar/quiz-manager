@@ -1,5 +1,5 @@
 "use client";
-import { Brain } from "lucide-react";
+import { Brain, School } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
@@ -80,9 +80,11 @@ const Navbar = () => {
                 <span>Competitions</span>
               </DropdownMenuItem>
               <DropdownMenuItem>
+                <Avatar className="h-4 w-4" />
                 <span>Elementary</span>
               </DropdownMenuItem>
               <DropdownMenuItem>
+                <School className="h-4 w-4" />
                 <span>Secondary</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
